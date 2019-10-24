@@ -1,26 +1,18 @@
-const http = require('http');
-const url = require('url');
-const querystring = require('querystring');
+const express = require('express');
 
-const server = http.createServer((req, res) => {
-    const page = url.parse(req.url).pathname;
-    const params = querystring.parse(url.parse(req.url).query);
-    console.log(page);
-    console.log(params);
+const app = express();
 
-    if (page !== '/') {
-        res.writeHead(404, {'Content-Type': 'text/html'});
-        res.write('<h1>404 page not found</h1>');
-    }
-    else if ('firstname' in params && 'lastname' in params) {
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        res.write(`<h1>Hello ${params.firstname} ${params.lastname}</h1>`);
-    }
-    else {
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        res.write('<h1>Hello Anonymous !!!</h1>');
-    }
-    res.end()
-});
+app.get('/mysite', (req, res) => {
+    res.setHeader('Content-Type', 'text/plain');
+    res.send('You are at the home page');
+})
+.get('/mysite/:page', (req, res) => {
+    res.render('page.ejs', {page: req.params.page});
+})
 
-server.listen(8080);
+app.use((req, res, next) => {
+    res.setHeader('Content-Type', 'text/plain');
+    res.send('Error 404 : page doesn\'t exist');
+})
+
+app.listen(8080);
